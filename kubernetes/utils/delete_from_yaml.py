@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import re
 from os import path
 
 import yaml
 from kubernetes import client
 
+UPPER_FOLLOWED_BY_LOWER_RE = re.compile('(.)([A-Z][a-z]+)')
+LOWER_OR_NUM_FOLLOWED_BY_UPPER_RE = re.compile('([a-z0-9])([A-Z])')
 
 def delete_from_yaml(k8s_client, yaml_file, verbose=False,
                      namespace="default", **kwargs):
