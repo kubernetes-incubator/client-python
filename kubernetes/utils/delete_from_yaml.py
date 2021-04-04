@@ -23,7 +23,9 @@ from kubernetes import client
 
 def delete_from_yaml(k8s_client, yaml_file, verbose=False,
                      namespace="default", **kwargs):
-    """Input:
+    """
+    Delete a resource from a yaml file.
+    Input:
     yaml_file: string. Contains the path to yaml file.
     k8s_client: an ApiClient object, initialized with the client args.
     verbose: If True, print confirmation from the create action.
@@ -50,7 +52,6 @@ def delete_from_yaml(k8s_client, yaml_file, verbose=False,
         failures = []
         for yml_document in yml_document_all:
             try:
-                # call delete from dict function
                 delete_from_dict(k8s_client, yml_document, verbose,
                                  namespace=namespace, **kwargs)
             except FailToDeleteError as failure:
@@ -61,6 +62,23 @@ def delete_from_yaml(k8s_client, yaml_file, verbose=False,
 
 def delete_from_dict(k8s_client, yml_document, verbose,
                      namespace="default", **kwargs):
+    """
+    Delete a kubernetes resource from a dictionary containing valid kubernetes
+    API object (i.e. List, Service, etc).
+    Input:
+    k8s_client: an ApiClient object, initialized with the client args.
+    yml_document: a dictionary holding valid kubernetes objects
+    verbose: If True, print confirmation from the create action.
+        Default is False.
+    namespace: string. Contains the namespace to create all
+        resources inside. The namespace must preexist otherwise
+        the resource creation will fail. If the API object in
+        the yaml file already contains a namespace definition
+        this parameter has no effect.
+    Raises:
+        FailToDeleteError which holds list of `client.rest.ApiException`
+        instances for each object that failed to create.
+    """
     api_exceptions = []
     if "List" in yml_document["kind"]:
         kind = yml_document["kind"].replace("List", "")
@@ -75,7 +93,6 @@ def delete_from_dict(k8s_client, yml_document, verbose,
             except client.rest.ApiException as api_exception:
                 api_exceptions.append(api_exception)
     else:
-
         try:
             delete_from_yaml_single_item(
                 k8s_client, yml_document, verbose,
