@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+# Utilities for parsing/writing the Python client's changelog.
+
 changelog="$(git rev-parse --show-toplevel)/CHANGELOG.md"
 
 function util::changelog::has_release {
@@ -44,7 +47,7 @@ function util::changelog::find_release_end {
   echo $((${releases[${next_release_index}]}-1))
 }
 
-# has_section returns if the given section exists between start and end
+# has_section_in_range returns if the given section exists between start and end
 function util::changelog::has_section_in_range {
   local section="$1"
   local start=$2
@@ -59,7 +62,7 @@ function util::changelog::has_section_in_range {
   return 1
 }
 
-# find_section returns the number of the first line of the given section
+# find_section_in_range returns the number of the first line of the given section
 function util::changelog::find_section_in_range {
   local section="$1"
   local start=$2
@@ -106,4 +109,45 @@ function util::changelog::write_changelog {
 
   # update changelog
   sed -i "${line_to_edit}i${release_notes}" $changelog
+}
+
+# get_api_version returns the Kubernetes API Version for the given client
+# version in the changelog.
+function util::changelog::get_k8s_api_version {
+  local client_version="$1"
+
+  local api_version_section="Kubernetes API Version: "
+  if ! util::changelog::has_release "$client_version"; then
+    echo "error: release $client_version not found"
+    exit 1
+  fi
+
+  local start=$(util::changelog::find_release_start "$client_version")
+  local end=$(util::changelog::find_release_end "$client_version")
+  if ! util::changelog::has_section_in_range "$api_version_section" "$start" "$end"; then
+    echo "error: api version for release $client_version not found"
+    exit 1
+  fi
+
+  local api_version_line=$(util::changelog::find_section_in_range "$api_version_section" "$start" "$end")
+  echo $(sed -n ${api_version_line}p $changelog | sed "s/$api_version_section//g")
+}
+
+function util::changelog::update_release_api_version {
+  local release="$1"
+  local old_release="$2"
+  local k8s_api_version="$3"
+
+  echo "New release: $release"
+  echo "Old release: $old_release"
+
+  if ! util::changelog::has_release v$old_release; then
+    sed -i "1i# v$release\n\nKubernetes API Version: $k8s_api_version\n\n" $changelog
+    exit 0
+  fi
+  start=$(util::changelog::find_release_start v$old_release)
+  sed -i "${start}s/# v$old_release/# v$release/" $changelog
+  echo "$start"
+  echo "$((${start}+2))"
+  sed -i "$((${start}+2))s/^Kubernetes API Version: .*$/Kubernetes API Version: $k8s_api_version/" $changelog
 }

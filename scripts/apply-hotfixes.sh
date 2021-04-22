@@ -24,16 +24,6 @@ then
     exit 1
 fi
 
-# Check if the current branch is a release branch (release-*)
-# If it is not a release branch, don't let the patch be applied
-GIT_BRANCH=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
-if ! [[ $GIT_BRANCH =~ .*release-.* ]]; then
-    echo Current branch: $GIT_BRANCH
-    echo You are not in a release branch, e.g., release-11.0, release-10.0
-    echo Please switch to a release branch to run this script.
-    exit 1
-fi
-
 # Patching commit for custom client behavior
 # UPDATE: The commit being cherry-picked is updated since the the client generated in 1adaaecd0879d7315f48259ad8d6cbd66b835385
 # differs from the initial hotfix
