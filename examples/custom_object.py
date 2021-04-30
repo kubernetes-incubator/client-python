@@ -93,6 +93,28 @@ def main():
     print("Resource details:")
     pprint(resource)
 
+    # patch the resource
+    resource = api.patch_namespaced_custom_object(
+        group="stable.example.com",
+        version="v1",
+        name="my-new-cron-object",
+        namespace="default",
+        plural="crontabs",
+        body={'image': 'my-awesome-cron-image:2'},
+        content_type="application/merge-patch+json"
+    )
+
+    # get the resource and print out data
+    resource = api.get_namespaced_custom_object(
+        group="stable.example.com",
+        version="v1",
+        name="my-new-cron-object",
+        namespace="default",
+        plural="crontabs",
+    )
+    print("Resource details:")
+    pprint(resource)
+
     # delete it
     api.delete_namespaced_custom_object(
         group="stable.example.com",
