@@ -42,9 +42,9 @@ fi
 
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")
 CLIENT_ROOT="${SCRIPT_ROOT}/../kubernetes"
-CLIENT_VERSION=$(python "${SCRIPT_ROOT}/constants.py" CLIENT_VERSION)
-PACKAGE_NAME=$(python "${SCRIPT_ROOT}/constants.py" PACKAGE_NAME)
-DEVELOPMENT_STATUS=$(python "${SCRIPT_ROOT}/constants.py" DEVELOPMENT_STATUS)
+CLIENT_VERSION=$(python3 "${SCRIPT_ROOT}/constants.py" CLIENT_VERSION)
+PACKAGE_NAME=$(python3 "${SCRIPT_ROOT}/constants.py" PACKAGE_NAME)
+DEVELOPMENT_STATUS=$(python3 "${SCRIPT_ROOT}/constants.py" DEVELOPMENT_STATUS)
 
 pushd "${SCRIPT_ROOT}" > /dev/null
 SCRIPT_ROOT=`pwd`
@@ -58,8 +58,8 @@ TEMP_FOLDER=$(mktemp -d)
 trap "rm -rf ${TEMP_FOLDER}" EXIT SIGINT
 
 SETTING_FILE="${TEMP_FOLDER}/settings"
-echo "export KUBERNETES_BRANCH=\"$(python ${SCRIPT_ROOT}/constants.py KUBERNETES_BRANCH)\"" > $SETTING_FILE
-echo "export CLIENT_VERSION=\"$(python ${SCRIPT_ROOT}/constants.py CLIENT_VERSION)\"" >> $SETTING_FILE
+echo "export KUBERNETES_BRANCH=\"$(python3 ${SCRIPT_ROOT}/constants.py KUBERNETES_BRANCH)\"" > $SETTING_FILE
+echo "export CLIENT_VERSION=\"$(python3 ${SCRIPT_ROOT}/constants.py CLIENT_VERSION)\"" >> $SETTING_FILE
 echo "export PACKAGE_NAME=\"client\"" >> $SETTING_FILE
 
 if [[ -z ${GEN_ROOT:-} ]]; then
