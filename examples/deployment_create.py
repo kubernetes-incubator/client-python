@@ -19,7 +19,6 @@ Creates a deployment using AppsV1Api from file nginx-deployment.yaml.
 from os import path
 
 import yaml
-
 from kubernetes import client, config
 
 

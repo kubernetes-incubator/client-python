@@ -17,7 +17,6 @@ import re
 from os import path
 
 import yaml
-
 from kubernetes import client
 
 UPPER_FOLLOWED_BY_LOWER_RE = re.compile('(.)([A-Z][a-z]+)')
